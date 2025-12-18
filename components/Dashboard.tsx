@@ -139,19 +139,52 @@ export const Dashboard: React.FC<DashboardProps> = ({ userId, userEmail, onSignO
         innerCard.style.transform = 'none';
 
         try {
+            // Detect mobile
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
             const dataUrl = await toPng(element, {
                 quality: 1,
-                pixelRatio: 3,
+                pixelRatio: isMobile ? 2 : 3, // Lower resolution on mobile
                 cacheBust: true,
+                // Fix for mobile cross-origin images
+                fetchRequestInit: {
+                    mode: 'cors',
+                    cache: 'no-cache',
+                },
+                // Skip fonts that may cause issues on mobile
+                skipFonts: isMobile,
+                // Include inline styles
+                includeQueryParams: true,
             });
 
-            const link = document.createElement('a');
-            link.download = `carta-mestre-${avatarCard?.name || 'fundador'}.png`;
-            link.href = dataUrl;
-            link.click();
+            // For mobile, try to use share API or fallback to download
+            if (isMobile && navigator.share) {
+                try {
+                    const response = await fetch(dataUrl);
+                    const blob = await response.blob();
+                    const file = new File([blob], `carta-mestre-${avatarCard?.name || 'fundador'}.png`, { type: 'image/png' });
+
+                    await navigator.share({
+                        files: [file],
+                        title: 'Minha Carta Mestre',
+                        text: 'Confira minha carta no Amigo Trunfo XP!'
+                    });
+                } catch (shareErr) {
+                    // Fallback to regular download if share fails
+                    const link = document.createElement('a');
+                    link.download = `carta-mestre-${avatarCard?.name || 'fundador'}.png`;
+                    link.href = dataUrl;
+                    link.click();
+                }
+            } else {
+                const link = document.createElement('a');
+                link.download = `carta-mestre-${avatarCard?.name || 'fundador'}.png`;
+                link.href = dataUrl;
+                link.click();
+            }
         } catch (err) {
             console.error('Erro ao salvar imagem:', err);
-            alert('Erro ao salvar imagem.');
+            alert('Erro ao salvar imagem. Tente usar a função de screenshot do seu celular.');
         } finally {
             innerCard.style.transform = originalTransform;
         }

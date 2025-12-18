@@ -81,7 +81,9 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
                                     onClick={() => handleNostalgicClick('Orkut')}
                                     className="w-full px-4 py-3 bg-gradient-to-b from-[#EC5595] to-[#D93E7D] text-white font-digital font-bold text-sm rounded shadow-md hover:brightness-110 active:translate-y-0.5 flex items-center justify-center gap-3 border-2 border-[#C72E6D] transition-all"
                                 >
-                                    <img src="https://images.icon-icons.com/844/PNG/512/Orkut_icon-icons.com_67057.png" alt="Orkut" className="w-6 h-6" />
+                                    <div className="w-6 h-6 bg-white rounded-full p-0.5 flex items-center justify-center">
+                                        <img src="https://images.icon-icons.com/122/PNG/512/orkut_socialnetwork_20026.png" alt="Orkut" className="w-5 h-5" />
+                                    </div>
                                     Entrar com Orkut
                                 </button>
 
