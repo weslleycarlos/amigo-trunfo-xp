@@ -7,9 +7,18 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies
 node_modules
+
+# Build output
 dist
 dist-ssr
+build
+
+# Environment variables (IMPORTANT: keep secrets safe!)
+.env
+.env.local
+.env.*.local
 *.local
 
 # Editor directories and files
@@ -22,3 +31,15 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# OS files
+Thumbs.db
+
+# Debug
+*.pem
+
+# Vercel
+.vercel
+
+# TypeScript cache
+*.tsbuildinfo
