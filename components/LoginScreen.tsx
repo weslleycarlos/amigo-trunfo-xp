@@ -81,7 +81,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
                                     onClick={() => handleNostalgicClick('Orkut')}
                                     className="w-full px-4 py-3 bg-gradient-to-b from-[#EC5595] to-[#D93E7D] text-white font-digital font-bold text-sm rounded shadow-md hover:brightness-110 active:translate-y-0.5 flex items-center justify-center gap-3 border-2 border-[#C72E6D] transition-all"
                                 >
-                                    <span className="text-lg">💗</span>
+                                    <img src="https://images.icon-icons.com/844/PNG/512/Orkut_icon-icons.com_67057.png" alt="Orkut" className="w-6 h-6" />
                                     Entrar com Orkut
                                 </button>
 
@@ -90,7 +90,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
                                     onClick={() => handleNostalgicClick('MSN Messenger')}
                                     className="w-full px-4 py-3 bg-gradient-to-b from-[#5DC161] to-[#3EA643] text-white font-digital font-bold text-sm rounded shadow-md hover:brightness-110 active:translate-y-0.5 flex items-center justify-center gap-3 border-2 border-[#2E9431] transition-all"
                                 >
-                                    <span className="text-lg">🦋</span>
+                                    <img src="https://images.icon-icons.com/5/PNG/256/MSN_messenger_user_156.png" alt="MSN" className="w-6 h-6" />
                                     Entrar com MSN Messenger
                                 </button>
 

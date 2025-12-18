@@ -179,11 +179,41 @@ export const HoloCard: React.FC<HoloCardProps> = ({ data, stats, id, rarity = 'c
     setGlare({ x: 50, y: 50 });
   };
 
+  // Touch handlers for mobile
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    if (rarity === 'secret_rare') return;
+
+    const touch = e.touches[0];
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
+
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    // Reduced rotation for mobile (less intense)
+    const rotateX = ((y - centerY) / centerY) * -10;
+    const rotateY = ((x - centerX) / centerX) * 10;
+
+    setRotate({ x: rotateX, y: rotateY });
+    setGlare({ x: (x / rect.width) * 100, y: (y / rect.height) * 100 });
+  };
+
+  const handleTouchEnd = () => {
+    // Smooth reset on touch end
+    setRotate({ x: 0, y: 0 });
+    setGlare({ x: 50, y: 50 });
+  };
+
   return (
     <div
-      className="perspective-1000 group w-[320px] h-[480px] mx-auto select-none"
+      className="perspective-1000 group w-[320px] h-[480px] mx-auto select-none touch-none"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchEnd}
       id={id}
     >
       <div

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { User, Package, Swords, Trophy, LogOut, Star, Sparkles, Wand2, Download, Share2, Layers } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { getLevelFromXp, getLevelProgress, getXpToNextLevel } from '../lib/levelSystem';
 import { HoloCard } from './HoloCard';
 import { CardPlayground } from './CardPlayground';
 import { PackOpening } from './PackOpening';
+import { BattleScreen } from './BattleScreen';
 import { toPng } from 'html-to-image';
 import type { FormData, CardStats, Rarity } from '../types';
 
@@ -41,6 +43,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ userId, userEmail, onSignO
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'home' | 'collection' | 'battle' | 'create'>('home');
     const [showPackOpening, setShowPackOpening] = useState(false);
+    const [showBattle, setShowBattle] = useState(false);
     const [userCards, setUserCards] = useState<AvatarCard[]>([]);
 
     useEffect(() => {
@@ -260,10 +263,22 @@ export const Dashboard: React.FC<DashboardProps> = ({ userId, userEmail, onSignO
                     </div>
 
                     <div className="flex items-center gap-4">
-                        {/* User Info */}
+                        {/* User Info with Level */}
                         <div className="text-right">
                             <p className="text-white font-digital text-sm drop-shadow">{profile?.username || 'Jogador'}</p>
-                            <p className="text-xs text-blue-200">{profile?.level || 'Fundador'} • {profile?.xp || 0} XP</p>
+                            <div className="flex items-center gap-2 justify-end">
+                                <span
+                                    className="text-xs font-bold px-2 py-0.5 rounded"
+                                    style={{
+                                        backgroundColor: getLevelFromXp(profile?.xp || 0).color,
+                                        color: 'white',
+                                        textShadow: '1px 1px 2px rgba(0,0,0,0.5)'
+                                    }}
+                                >
+                                    {getLevelFromXp(profile?.xp || 0).icon} Lv.{getLevelFromXp(profile?.xp || 0).level}
+                                </span>
+                                <span className="text-xs text-blue-200">{profile?.xp || 0} XP</span>
+                            </div>
                         </div>
 
                         {/* Sign Out */}
@@ -374,10 +389,41 @@ export const Dashboard: React.FC<DashboardProps> = ({ userId, userEmail, onSignO
                                 <div className="grid grid-cols-2 gap-3 text-sm">
                                     <div className="text-gray-600">Cartas na coleção:</div>
                                     <div className="text-gray-800 font-bold">{userCards.length}</div>
-                                    <div className="text-gray-600">Batalhas vencidas:</div>
-                                    <div className="text-gray-800 font-bold">0</div>
                                     <div className="text-gray-600">Packs disponíveis:</div>
                                     <div className="text-gray-800 font-bold">{profile?.packs_available || 0}</div>
+                                </div>
+
+                                {/* Level Progress */}
+                                <div className="mt-4 pt-4 border-t border-[#ACA899]">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span
+                                            className="text-sm font-bold px-2 py-1 rounded"
+                                            style={{
+                                                backgroundColor: getLevelFromXp(profile?.xp || 0).color,
+                                                color: 'white'
+                                            }}
+                                        >
+                                            {getLevelFromXp(profile?.xp || 0).icon} {getLevelFromXp(profile?.xp || 0).title}
+                                        </span>
+                                        <span className="text-xs text-gray-500">
+                                            {getXpToNextLevel(profile?.xp || 0) > 0
+                                                ? `${getXpToNextLevel(profile?.xp || 0)} XP para próximo nível`
+                                                : 'Nível máximo!'
+                                            }
+                                        </span>
+                                    </div>
+                                    <div className="w-full bg-gray-300 rounded-full h-3">
+                                        <div
+                                            className="h-3 rounded-full transition-all duration-500"
+                                            style={{
+                                                width: `${getLevelProgress(profile?.xp || 0)}%`,
+                                                backgroundColor: getLevelFromXp(profile?.xp || 0).color
+                                            }}
+                                        />
+                                    </div>
+                                    <p className="text-xs text-center text-gray-500 mt-1">
+                                        {profile?.xp || 0} XP Total
+                                    </p>
                                 </div>
                             </div>
 
@@ -450,16 +496,20 @@ export const Dashboard: React.FC<DashboardProps> = ({ userId, userEmail, onSignO
                             <div className="bg-[#ECE9D8] border-2 border-[#ACA899] rounded-lg p-8 max-w-md mx-auto shadow-lg">
                                 <Swords className="w-24 h-24 mx-auto text-[#0054E3] mb-4" />
                                 <h2 className="text-2xl font-bold text-[#0054E3] font-digital mb-2">Arena de Batalha</h2>
-                                <p className="text-gray-600 mb-6">Desafie outros jogadores e NPCs famosos!</p>
+                                <p className="text-gray-600 mb-6">Desafie NPCs famosos e ganhe XP!</p>
 
-                                <button
-                                    className="px-8 py-4 bg-gray-300 border-2 border-gray-400 text-gray-500 font-bold text-lg rounded shadow font-digital cursor-not-allowed"
-                                    disabled
-                                >
-                                    🔒 Em Breve
-                                </button>
+                                {userCards.length > 0 ? (
+                                    <button
+                                        onClick={() => setShowBattle(true)}
+                                        className="px-8 py-4 bg-gradient-to-b from-[#FF6B35] to-[#E05020] border-2 border-[#B03010] text-white font-bold text-lg rounded shadow-lg hover:brightness-110 transition font-digital"
+                                    >
+                                        ⚔️ Iniciar Batalha
+                                    </button>
+                                ) : (
+                                    <p className="text-gray-500">Você precisa de cartas para batalhar. Abra packs primeiro!</p>
+                                )}
 
-                                <p className="text-xs text-gray-500 mt-4">Fase 3 do desenvolvimento</p>
+                                <p className="text-xs text-gray-500 mt-4">Cartas na coleção: {userCards.length}</p>
                             </div>
                         </div>
                     )}
@@ -480,6 +530,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ userId, userEmail, onSignO
                         loadUserData(); // Reload profile data
                     }}
                     onClose={() => setShowPackOpening(false)}
+                />
+            )}
+
+            {/* Battle Screen Modal */}
+            {showBattle && (
+                <BattleScreen
+                    userId={userId}
+                    onClose={() => setShowBattle(false)}
+                    onBattleEnd={(won, xpGained) => {
+                        loadUserData(); // Reload to update XP
+                        console.log(`Battle ended: ${won ? 'Won' : 'Lost'}, XP: ${xpGained}`);
+                    }}
                 />
             )}
         </div>
