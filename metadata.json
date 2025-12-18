@@ -1,0 +1,7 @@
+{
+  "name": "Amigo Trunfo: Geração XP",
+  "description": "Um gerador de cartas nostálgico estilo anos 90/2000 com estética Windows XP e holografia.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
