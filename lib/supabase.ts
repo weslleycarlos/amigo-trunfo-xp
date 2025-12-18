@@ -14,10 +14,14 @@ export const supabase = createClient(
 
 // Auth helpers
 export const signInWithGoogle = async () => {
+    // Use the full current URL (including path like /amigo-trunfo-xp/)
+    // This ensures OAuth redirects back to the correct path on GitHub Pages
+    const redirectUrl = window.location.href.split('?')[0]; // Remove query params
+
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-            redirectTo: window.location.origin
+            redirectTo: redirectUrl
         }
     });
     return { data, error };
